@@ -1,0 +1,1642 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>2026 世界杯概率实验室 - iPhone单文件版</title>
+    <style>
+:root {
+  color-scheme: light;
+  --bg: #f5f4ef;
+  --surface: #ffffff;
+  --surface-2: #f9faf6;
+  --ink: #1d2722;
+  --muted: #66736d;
+  --line: #dfe5dd;
+  --accent: #0b7f75;
+  --accent-2: #be5b3c;
+  --accent-3: #2d5f9a;
+  --warn: #a3443d;
+  --shadow: 0 18px 50px rgba(23, 31, 27, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    linear-gradient(180deg, rgba(11, 127, 117, 0.1), transparent 260px),
+    var(--bg);
+  color: var(--ink);
+  font-family:
+    "Microsoft YaHei",
+    "PingFang SC",
+    "Noto Sans CJK SC",
+    system-ui,
+    sans-serif;
+  line-height: 1.5;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  width: min(1440px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.topbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 0 20px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(2rem, 4vw, 4.1rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+h2 {
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+}
+
+.run-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.run-copy {
+  min-width: 156px;
+  text-align: right;
+}
+
+.run-copy span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.run-copy strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.primary-btn,
+.ghost-btn,
+.file-btn,
+.tab {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 142px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(11, 127, 117, 0.22);
+}
+
+.primary-btn:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.ghost-btn,
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.danger {
+  color: var(--warn);
+}
+
+.control-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(132px, 1fr)) minmax(420px, auto);
+  gap: 12px;
+  align-items: end;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+}
+
+.control-strip label,
+.team-rating-cell label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.control-strip input,
+.search-input,
+select {
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 0 11px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: 8px;
+}
+
+.file-btn input {
+  display: none;
+}
+
+.progress-shell {
+  height: 6px;
+  margin: 12px 0 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(29, 39, 34, 0.08);
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.12s ease;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tab {
+  padding: 0 18px;
+}
+
+.tab.active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.leader-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.leader-card {
+  min-height: 148px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.leader-card small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.leader-card strong {
+  display: block;
+  margin: 12px 0 6px;
+  font-size: 1.55rem;
+  line-height: 1.05;
+}
+
+.leader-card .metric {
+  color: var(--accent);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.leader-card:nth-child(2) .metric {
+  color: var(--accent-3);
+}
+
+.leader-card:nth-child(3) .metric {
+  color: var(--accent-2);
+}
+
+.table-section,
+.bracket-section {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-heading h2 {
+  margin: 0;
+}
+
+.section-heading select,
+.search-input {
+  max-width: 280px;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px;
+}
+
+th,
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+td {
+  font-size: 0.93rem;
+}
+
+tbody tr:hover {
+  background: rgba(11, 127, 117, 0.06);
+}
+
+.team-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 168px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(45, 95, 154, 0.12);
+  color: var(--accent-3);
+  font-weight: 900;
+}
+
+.team-name strong {
+  display: block;
+}
+
+.team-name span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.bar-cell {
+  min-width: 112px;
+}
+
+.bar-track {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgba(29, 39, 34, 0.07);
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(11, 127, 117, 0.82), rgba(190, 91, 60, 0.82));
+}
+
+.bar-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.group-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.group-card h2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.group-card ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  list-style: none;
+}
+
+.group-row {
+  display: grid;
+  grid-template-columns: 1fr 74px 74px;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.group-row strong,
+.group-row span {
+  min-width: 0;
+}
+
+.group-row span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.team-rating-input {
+  width: 112px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 10px;
+}
+
+.host-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  min-height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(190, 91, 60, 0.12);
+  color: var(--accent-2);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.model-grid article {
+  min-height: 170px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.model-grid p {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.bracket-section {
+  padding: 16px;
+}
+
+.bracket-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bracket-item {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.empty-state {
+  padding: 28px 16px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 1120px) {
+  .control-strip {
+    grid-template-columns: repeat(2, minmax(132px, 1fr));
+  }
+
+  .toolbar {
+    grid-column: 1 / -1;
+    justify-content: start;
+  }
+
+  .leader-grid,
+  .model-grid,
+  .bracket-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .group-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    width: min(100vw - 20px, 680px);
+    padding-top: 14px;
+  }
+
+  .topbar,
+  .run-panel,
+  .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .run-copy {
+    text-align: left;
+  }
+
+  .primary-btn {
+    width: 100%;
+  }
+
+  .control-strip,
+  .leader-grid,
+  .model-grid,
+  .group-grid,
+  .bracket-list {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .tab {
+    flex: 0 0 auto;
+  }
+
+  .section-heading select,
+  .search-input {
+    max-width: none;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <noscript>这个页面需要开启 JavaScript 才能运行。</noscript>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">FIFA World Cup 2026</p>
+          <h1>世界杯概率实验室</h1>
+        </div>
+        <div class="run-panel">
+          <div class="run-copy">
+            <span id="runStatus">准备模拟</span>
+            <strong id="lastRun">尚未运行</strong>
+          </div>
+          <button id="runBtn" class="primary-btn" type="button">
+            <span aria-hidden="true">▶</span>
+            运行模拟
+          </button>
+        </div>
+      </header>
+
+      <section class="control-strip" aria-label="模拟参数">
+        <label>
+          模拟次数
+          <input id="simCount" type="number" min="1000" max="200000" step="1000" value="10000" />
+        </label>
+        <label>
+          基础进球
+          <input id="baseGoals" type="number" min="0.8" max="2.2" step="0.05" value="1.35" />
+        </label>
+        <label>
+          冷门系数
+          <input id="upsetFactor" type="number" min="0.65" max="1.7" step="0.05" value="1.00" />
+        </label>
+        <label>
+          东道主加成
+          <input id="hostBoost" type="number" min="0" max="120" step="5" value="55" />
+        </label>
+        <div class="toolbar">
+          <button id="exportCsvBtn" class="ghost-btn" type="button">导出 CSV</button>
+          <button id="exportConfigBtn" class="ghost-btn" type="button">导出配置</button>
+          <label class="file-btn">
+            导入配置
+            <input id="importConfigInput" type="file" accept="application/json" />
+          </label>
+          <button id="resetBtn" class="ghost-btn danger" type="button">重置</button>
+        </div>
+      </section>
+
+      <div class="progress-shell" aria-hidden="true">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <nav class="tabs" aria-label="视图切换">
+        <button class="tab active" data-tab="overview" type="button">总览</button>
+        <button class="tab" data-tab="groups" type="button">小组</button>
+        <button class="tab" data-tab="teams" type="button">球队强度</button>
+        <button class="tab" data-tab="model" type="button">模型</button>
+      </nav>
+
+      <section id="overview" class="tab-panel active">
+        <div id="leaderCards" class="leader-grid"></div>
+        <section class="table-section">
+          <div class="section-heading">
+            <h2>球队概率</h2>
+            <select id="sortSelect" aria-label="排序">
+              <option value="champion">按夺冠概率</option>
+              <option value="final">按进决赛概率</option>
+              <option value="sf">按进四强概率</option>
+              <option value="qf">按进八强概率</option>
+              <option value="r32">按进 32 强概率</option>
+              <option value="groupWinner">按小组第一概率</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>球队</th>
+                  <th>组</th>
+                  <th>强度</th>
+                  <th>小组第一</th>
+                  <th>32 强</th>
+                  <th>16 强</th>
+                  <th>八强</th>
+                  <th>四强</th>
+                  <th>决赛</th>
+                  <th>冠军</th>
+                </tr>
+              </thead>
+              <tbody id="probabilityBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="groups" class="tab-panel">
+        <div id="groupGrid" class="group-grid"></div>
+      </section>
+
+      <section id="teams" class="tab-panel">
+        <div class="section-heading">
+          <h2>球队强度</h2>
+          <input id="teamSearch" class="search-input" type="search" placeholder="搜索球队或小组" />
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>球队</th>
+                <th>英文名</th>
+                <th>小组</th>
+                <th>档位</th>
+                <th>强度分</th>
+                <th>东道主</th>
+              </tr>
+            </thead>
+            <tbody id="teamEditorBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="model" class="tab-panel">
+        <div class="model-grid">
+          <article>
+            <h2>赛制</h2>
+            <p>48 队、12 个四队小组；每组前二和 8 个成绩最好的第三名进入 32 强。</p>
+          </article>
+          <article>
+            <h2>比赛模型</h2>
+            <p>球队强度差转换为预期进球，比分用泊松分布抽样；淘汰赛平局按强度差进入加时/点球胜率。</p>
+          </article>
+          <article>
+            <h2>淘汰赛</h2>
+            <p>32 强固定对阵按 FIFA 公布框架；第三名落位使用对应比赛的候选小组约束自动分配。</p>
+          </article>
+          <article>
+            <h2>数据</h2>
+            <p>默认名单为 2026 世界杯 A-L 组；默认强度是可编辑的模型初始值，不代表官方赔率。</p>
+          </article>
+        </div>
+        <section class="bracket-section">
+          <h2>32 强对阵框架</h2>
+          <div id="bracketList" class="bracket-list"></div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+"use strict";
+
+const STORAGE_KEY = "wc2026-probability-lab-v1";
+const GROUPS = "ABCDEFGHIJKL".split("");
+
+const DEFAULT_TEAMS = [
+  { id: "MEX", zh: "墨西哥", en: "Mexico", group: "A", slot: 1, rating: 1825, host: true },
+  { id: "RSA", zh: "南非", en: "South Africa", group: "A", slot: 2, rating: 1600, host: false },
+  { id: "KOR", zh: "韩国", en: "South Korea", group: "A", slot: 3, rating: 1740, host: false },
+  { id: "CZE", zh: "捷克", en: "Czech Republic", group: "A", slot: 4, rating: 1770, host: false },
+
+  { id: "CAN", zh: "加拿大", en: "Canada", group: "B", slot: 1, rating: 1710, host: true },
+  { id: "QAT", zh: "卡塔尔", en: "Qatar", group: "B", slot: 2, rating: 1610, host: false },
+  { id: "SUI", zh: "瑞士", en: "Switzerland", group: "B", slot: 3, rating: 1860, host: false },
+  { id: "BIH", zh: "波黑", en: "Bosnia and Herzegovina", group: "B", slot: 4, rating: 1680, host: false },
+
+  { id: "BRA", zh: "巴西", en: "Brazil", group: "C", slot: 1, rating: 2020, host: false },
+  { id: "MAR", zh: "摩洛哥", en: "Morocco", group: "C", slot: 2, rating: 1900, host: false },
+  { id: "HAI", zh: "海地", en: "Haiti", group: "C", slot: 3, rating: 1460, host: false },
+  { id: "SCO", zh: "苏格兰", en: "Scotland", group: "C", slot: 4, rating: 1720, host: false },
+
+  { id: "USA", zh: "美国", en: "United States", group: "D", slot: 1, rating: 1830, host: true },
+  { id: "PAR", zh: "巴拉圭", en: "Paraguay", group: "D", slot: 2, rating: 1760, host: false },
+  { id: "AUS", zh: "澳大利亚", en: "Australia", group: "D", slot: 3, rating: 1740, host: false },
+  { id: "TUR", zh: "土耳其", en: "Turkey", group: "D", slot: 4, rating: 1790, host: false },
+
+  { id: "GER", zh: "德国", en: "Germany", group: "E", slot: 1, rating: 1945, host: false },
+  { id: "CUW", zh: "库拉索", en: "Curacao", group: "E", slot: 2, rating: 1450, host: false },
+  { id: "CIV", zh: "科特迪瓦", en: "Ivory Coast", group: "E", slot: 3, rating: 1735, host: false },
+  { id: "ECU", zh: "厄瓜多尔", en: "Ecuador", group: "E", slot: 4, rating: 1785, host: false },
+
+  { id: "NED", zh: "荷兰", en: "Netherlands", group: "F", slot: 1, rating: 1995, host: false },
+  { id: "JPN", zh: "日本", en: "Japan", group: "F", slot: 2, rating: 1840, host: false },
+  { id: "SWE", zh: "瑞典", en: "Sweden", group: "F", slot: 3, rating: 1780, host: false },
+  { id: "TUN", zh: "突尼斯", en: "Tunisia", group: "F", slot: 4, rating: 1660, host: false },
+
+  { id: "BEL", zh: "比利时", en: "Belgium", group: "G", slot: 1, rating: 1950, host: false },
+  { id: "EGY", zh: "埃及", en: "Egypt", group: "G", slot: 2, rating: 1755, host: false },
+  { id: "IRN", zh: "伊朗", en: "Iran", group: "G", slot: 3, rating: 1765, host: false },
+  { id: "NZL", zh: "新西兰", en: "New Zealand", group: "G", slot: 4, rating: 1490, host: false },
+
+  { id: "ESP", zh: "西班牙", en: "Spain", group: "H", slot: 1, rating: 2045, host: false },
+  { id: "CPV", zh: "佛得角", en: "Cape Verde", group: "H", slot: 2, rating: 1590, host: false },
+  { id: "KSA", zh: "沙特阿拉伯", en: "Saudi Arabia", group: "H", slot: 3, rating: 1630, host: false },
+  { id: "URU", zh: "乌拉圭", en: "Uruguay", group: "H", slot: 4, rating: 1880, host: false },
+
+  { id: "FRA", zh: "法国", en: "France", group: "I", slot: 1, rating: 2035, host: false },
+  { id: "SEN", zh: "塞内加尔", en: "Senegal", group: "I", slot: 2, rating: 1810, host: false },
+  { id: "NOR", zh: "挪威", en: "Norway", group: "I", slot: 3, rating: 1780, host: false },
+  { id: "IRQ", zh: "伊拉克", en: "Iraq", group: "I", slot: 4, rating: 1575, host: false },
+
+  { id: "ARG", zh: "阿根廷", en: "Argentina", group: "J", slot: 1, rating: 2050, host: false },
+  { id: "ALG", zh: "阿尔及利亚", en: "Algeria", group: "J", slot: 2, rating: 1695, host: false },
+  { id: "AUT", zh: "奥地利", en: "Austria", group: "J", slot: 3, rating: 1795, host: false },
+  { id: "JOR", zh: "约旦", en: "Jordan", group: "J", slot: 4, rating: 1535, host: false },
+
+  { id: "POR", zh: "葡萄牙", en: "Portugal", group: "K", slot: 1, rating: 2005, host: false },
+  { id: "COD", zh: "刚果民主共和国", en: "DR Congo", group: "K", slot: 2, rating: 1580, host: false },
+  { id: "UZB", zh: "乌兹别克斯坦", en: "Uzbekistan", group: "K", slot: 3, rating: 1585, host: false },
+  { id: "COL", zh: "哥伦比亚", en: "Colombia", group: "K", slot: 4, rating: 1885, host: false },
+
+  { id: "ENG", zh: "英格兰", en: "England", group: "L", slot: 1, rating: 2025, host: false },
+  { id: "CRO", zh: "克罗地亚", en: "Croatia", group: "L", slot: 2, rating: 1905, host: false },
+  { id: "GHA", zh: "加纳", en: "Ghana", group: "L", slot: 3, rating: 1675, host: false },
+  { id: "PAN", zh: "巴拿马", en: "Panama", group: "L", slot: 4, rating: 1570, host: false }
+];
+
+const DEFAULT_SETTINGS = {
+  simCount: 10000,
+  baseGoals: 1.35,
+  upsetFactor: 1,
+  hostBoost: 55
+};
+
+const GROUP_MATCHES = [
+  [1, 2],
+  [3, 4],
+  [1, 3],
+  [4, 2],
+  [4, 1],
+  [2, 3]
+];
+
+const THIRD_SLOTS = {
+  M74: ["A", "B", "C", "D", "F"],
+  M77: ["C", "D", "F", "G", "H"],
+  M79: ["C", "E", "F", "H", "I"],
+  M80: ["E", "H", "I", "J", "K"],
+  M81: ["B", "E", "F", "I", "J"],
+  M82: ["A", "E", "H", "I", "J"],
+  M85: ["E", "F", "G", "I", "J"],
+  M87: ["D", "E", "I", "J", "L"]
+};
+
+const ROUND32 = [
+  { id: "M73", a: "2A", b: "2B" },
+  { id: "M74", a: "1E", b: "3:M74" },
+  { id: "M75", a: "1F", b: "2C" },
+  { id: "M76", a: "1C", b: "2F" },
+  { id: "M77", a: "1I", b: "3:M77" },
+  { id: "M78", a: "2E", b: "2I" },
+  { id: "M79", a: "1A", b: "3:M79" },
+  { id: "M80", a: "1L", b: "3:M80" },
+  { id: "M81", a: "1D", b: "3:M81" },
+  { id: "M82", a: "1G", b: "3:M82" },
+  { id: "M83", a: "2K", b: "2L" },
+  { id: "M84", a: "1H", b: "2J" },
+  { id: "M85", a: "1B", b: "3:M85" },
+  { id: "M86", a: "1J", b: "2H" },
+  { id: "M87", a: "1K", b: "3:M87" },
+  { id: "M88", a: "2D", b: "2G" }
+];
+
+const NEXT_ROUNDS = {
+  r16: [
+    ["M73", "M75"],
+    ["M74", "M77"],
+    ["M76", "M78"],
+    ["M79", "M80"],
+    ["M83", "M84"],
+    ["M81", "M82"],
+    ["M86", "M88"],
+    ["M85", "M87"]
+  ],
+  qf: [
+    [0, 1],
+    [4, 5],
+    [2, 3],
+    [6, 7]
+  ],
+  sf: [
+    [0, 1],
+    [2, 3]
+  ],
+  final: [[0, 1]]
+};
+
+const STAGES = ["groupWinner", "groupRunnerUp", "thirdQualified", "r32", "r16", "qf", "sf", "final", "champion"];
+
+const els = {};
+let state = loadState();
+let results = null;
+let running = false;
+
+document.addEventListener("DOMContentLoaded", () => {
+  bindElements();
+  hydrateControls();
+  renderStaticBracket();
+  renderTeamsEditor();
+  renderEmptyResults();
+  attachEvents();
+  runSimulation();
+});
+
+function bindElements() {
+  [
+    "runBtn",
+    "runStatus",
+    "lastRun",
+    "simCount",
+    "baseGoals",
+    "upsetFactor",
+    "hostBoost",
+    "progressBar",
+    "leaderCards",
+    "probabilityBody",
+    "sortSelect",
+    "groupGrid",
+    "teamEditorBody",
+    "teamSearch",
+    "exportCsvBtn",
+    "exportConfigBtn",
+    "importConfigInput",
+    "resetBtn",
+    "bracketList"
+  ].forEach((id) => {
+    els[id] = document.getElementById(id);
+  });
+}
+
+function attachEvents() {
+  els.runBtn.addEventListener("click", runSimulation);
+  els.sortSelect.addEventListener("change", renderResults);
+  els.teamSearch.addEventListener("input", renderTeamsEditor);
+  els.exportCsvBtn.addEventListener("click", exportCsv);
+  els.exportConfigBtn.addEventListener("click", exportConfig);
+  els.importConfigInput.addEventListener("change", importConfig);
+  els.resetBtn.addEventListener("click", resetAll);
+
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.addEventListener("click", () => activateTab(tab.dataset.tab));
+  });
+
+  ["simCount", "baseGoals", "upsetFactor", "hostBoost"].forEach((id) => {
+    els[id].addEventListener("change", () => {
+      state.settings[id] = numberFromInput(els[id], DEFAULT_SETTINGS[id]);
+      saveState();
+    });
+  });
+}
+
+function activateTab(tabId) {
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.tab === tabId);
+  });
+  document.querySelectorAll(".tab-panel").forEach((panel) => {
+    panel.classList.toggle("active", panel.id === tabId);
+  });
+}
+
+function hydrateControls() {
+  els.simCount.value = state.settings.simCount;
+  els.baseGoals.value = state.settings.baseGoals;
+  els.upsetFactor.value = state.settings.upsetFactor;
+  els.hostBoost.value = state.settings.hostBoost;
+}
+
+function loadState() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (parsed && Array.isArray(parsed.teams) && parsed.teams.length === DEFAULT_TEAMS.length) {
+      return {
+        teams: mergeTeams(parsed.teams),
+        settings: { ...DEFAULT_SETTINGS, ...parsed.settings }
+      };
+    }
+  } catch (error) {
+    console.warn("配置读取失败，使用默认值。", error);
+  }
+  return {
+    teams: cloneDefaultTeams(),
+    settings: { ...DEFAULT_SETTINGS }
+  };
+}
+
+function mergeTeams(savedTeams) {
+  const saved = new Map(savedTeams.map((team) => [team.id, team]));
+  return DEFAULT_TEAMS.map((team) => {
+    const savedTeam = saved.get(team.id);
+    const rating = Number.isFinite(Number(savedTeam?.rating)) ? Number(savedTeam.rating) : team.rating;
+    return { ...team, rating };
+  });
+}
+
+function cloneDefaultTeams() {
+  return DEFAULT_TEAMS.map((team) => ({ ...team }));
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn("配置保存失败，当前环境可能限制本地存储。", error);
+  }
+}
+
+function numberFromInput(input, fallback) {
+  const value = Number(input.value);
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function createAggregate(total) {
+  const rows = {};
+  state.teams.forEach((team) => {
+    rows[team.id] = {
+      team,
+      played: total,
+      groupPositionSum: 0,
+      avgPoints: 0
+    };
+    STAGES.forEach((stage) => {
+      rows[team.id][stage] = 0;
+    });
+  });
+  return { total, rows };
+}
+
+function runSimulation() {
+  if (running) return;
+  state.settings.simCount = clamp(Math.round(numberFromInput(els.simCount, 10000)), 1000, 200000);
+  state.settings.baseGoals = clamp(numberFromInput(els.baseGoals, 1.35), 0.8, 2.2);
+  state.settings.upsetFactor = clamp(numberFromInput(els.upsetFactor, 1), 0.65, 1.7);
+  state.settings.hostBoost = clamp(numberFromInput(els.hostBoost, 55), 0, 120);
+  hydrateControls();
+  saveState();
+
+  running = true;
+  const total = state.settings.simCount;
+  const aggregate = createAggregate(total);
+  let done = 0;
+  const started = performance.now();
+  const chunkSize = total <= 10000 ? 400 : 900;
+
+  els.runBtn.disabled = true;
+  els.runStatus.textContent = "模拟中";
+  els.lastRun.textContent = `0 / ${formatInt(total)}`;
+  els.progressBar.style.width = "0%";
+
+  const step = () => {
+    const next = Math.min(done + chunkSize, total);
+    for (; done < next; done += 1) {
+      simulateTournament(aggregate);
+    }
+    const pct = (done / total) * 100;
+    els.progressBar.style.width = `${pct}%`;
+    els.lastRun.textContent = `${formatInt(done)} / ${formatInt(total)}`;
+
+    if (done < total) {
+      requestAnimationFrame(step);
+      return;
+    }
+
+    running = false;
+    results = aggregate;
+    const elapsed = ((performance.now() - started) / 1000).toFixed(1);
+    els.runBtn.disabled = false;
+    els.runStatus.textContent = "模拟完成";
+    els.lastRun.textContent = `${formatInt(total)} 次 · ${elapsed}s`;
+    renderResults();
+  };
+
+  requestAnimationFrame(step);
+}
+
+function simulateTournament(aggregate) {
+  const settings = state.settings;
+  const teamMap = new Map(state.teams.map((team) => [team.id, team]));
+  const slotMap = {};
+  const thirdByGroup = {};
+  const groupThirdRows = [];
+
+  GROUPS.forEach((group) => {
+    const teams = state.teams.filter((team) => team.group === group).sort((a, b) => a.slot - b.slot);
+    const table = playGroup(teams, settings);
+    const ranked = rankGroup(table);
+
+    ranked.forEach((row, index) => {
+      aggregate.rows[row.team.id].groupPositionSum += index + 1;
+      aggregate.rows[row.team.id].avgPoints += row.pts;
+    });
+
+    const winner = ranked[0].team;
+    const runner = ranked[1].team;
+    const third = ranked[2];
+    slotMap[`1${group}`] = winner;
+    slotMap[`2${group}`] = runner;
+    thirdByGroup[group] = third.team;
+    groupThirdRows.push({ ...third, group });
+
+    aggregate.rows[winner.id].groupWinner += 1;
+    aggregate.rows[runner.id].groupRunnerUp += 1;
+  });
+
+  const qualifiedThirds = rankThirds(groupThirdRows).slice(0, 8);
+  qualifiedThirds.forEach((row) => {
+    aggregate.rows[row.team.id].thirdQualified += 1;
+  });
+
+  Object.values(slotMap).forEach((team) => {
+    aggregate.rows[team.id].r32 += 1;
+  });
+  qualifiedThirds.forEach((row) => {
+    aggregate.rows[row.team.id].r32 += 1;
+  });
+
+  const thirdAssignments = assignThirdSlots(qualifiedThirds.map((row) => row.group));
+  const round32Winners = {};
+  ROUND32.forEach((match) => {
+    const a = resolveEntrant(match.a, slotMap, thirdByGroup, thirdAssignments);
+    const b = resolveEntrant(match.b, slotMap, thirdByGroup, thirdAssignments);
+    round32Winners[match.id] = playKnockout(a, b, settings, teamMap);
+  });
+
+  Object.values(round32Winners).forEach((team) => {
+    aggregate.rows[team.id].r16 += 1;
+  });
+
+  const qfWinners = playStage(NEXT_ROUNDS.r16.map(([a, b]) => [round32Winners[a], round32Winners[b]]), "qf", aggregate, settings, teamMap);
+  const sfWinners = playIndexedStage(qfWinners, NEXT_ROUNDS.qf, "sf", aggregate, settings, teamMap);
+  const finalists = playIndexedStage(sfWinners, NEXT_ROUNDS.sf, "final", aggregate, settings, teamMap);
+  const champion = playKnockout(finalists[0], finalists[1], settings, teamMap);
+  aggregate.rows[champion.id].champion += 1;
+}
+
+function playGroup(teams, settings) {
+  const table = new Map();
+  teams.forEach((team) => {
+    table.set(team.id, {
+      team,
+      pts: 0,
+      gf: 0,
+      ga: 0,
+      gd: 0,
+      wins: 0,
+      lot: Math.random(),
+      h2h: new Map()
+    });
+  });
+
+  GROUP_MATCHES.forEach(([slotA, slotB]) => {
+    const a = teams.find((team) => team.slot === slotA);
+    const b = teams.find((team) => team.slot === slotB);
+    const match = playMatch(a, b, settings, false);
+    applyGroupResult(table.get(a.id), table.get(b.id), match.goalsA, match.goalsB);
+  });
+
+  return Array.from(table.values());
+}
+
+function applyGroupResult(a, b, goalsA, goalsB) {
+  a.gf += goalsA;
+  a.ga += goalsB;
+  b.gf += goalsB;
+  b.ga += goalsA;
+  a.gd = a.gf - a.ga;
+  b.gd = b.gf - b.ga;
+
+  let ptsA = 1;
+  let ptsB = 1;
+  if (goalsA > goalsB) {
+    ptsA = 3;
+    ptsB = 0;
+    a.wins += 1;
+  } else if (goalsB > goalsA) {
+    ptsA = 0;
+    ptsB = 3;
+    b.wins += 1;
+  }
+  a.pts += ptsA;
+  b.pts += ptsB;
+  a.h2h.set(b.team.id, { pts: ptsA, gf: goalsA, ga: goalsB, gd: goalsA - goalsB });
+  b.h2h.set(a.team.id, { pts: ptsB, gf: goalsB, ga: goalsA, gd: goalsB - goalsA });
+}
+
+function rankGroup(rows) {
+  const prelim = sortCopy(rows, compareRowsBasic);
+  const ranked = [];
+  let index = 0;
+  while (index < prelim.length) {
+    const tied = [prelim[index]];
+    let cursor = index + 1;
+    while (
+      cursor < prelim.length &&
+      prelim[cursor].pts === prelim[index].pts &&
+      prelim[cursor].gd === prelim[index].gd &&
+      prelim[cursor].gf === prelim[index].gf
+    ) {
+      tied.push(prelim[cursor]);
+      cursor += 1;
+    }
+    ranked.push(...sortCopy(tied, compareRowsHeadToHead(tied)));
+    index = cursor;
+  }
+  return ranked;
+}
+
+function compareRowsBasic(a, b) {
+  return b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || b.wins - a.wins || a.lot - b.lot;
+}
+
+function compareRowsHeadToHead(tiedRows) {
+  const ids = new Set(tiedRows.map((row) => row.team.id));
+  return (a, b) => {
+    const aMetric = h2hMetric(a, ids);
+    const bMetric = h2hMetric(b, ids);
+    return (
+      bMetric.pts - aMetric.pts ||
+      bMetric.gd - aMetric.gd ||
+      bMetric.gf - aMetric.gf ||
+      b.wins - a.wins ||
+      a.lot - b.lot
+    );
+  };
+}
+
+function h2hMetric(row, ids) {
+  const metric = { pts: 0, gf: 0, ga: 0, gd: 0 };
+  row.h2h.forEach((match, opponentId) => {
+    if (!ids.has(opponentId)) return;
+    metric.pts += match.pts;
+    metric.gf += match.gf;
+    metric.ga += match.ga;
+    metric.gd += match.gd;
+  });
+  return metric;
+}
+
+function rankThirds(rows) {
+  return sortCopy(rows, (a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.lot - b.lot);
+}
+
+function playStage(matches, stageName, aggregate, settings, teamMap) {
+  return matches.map(([a, b]) => {
+    const winner = playKnockout(a, b, settings, teamMap);
+    aggregate.rows[winner.id][stageName] += 1;
+    return winner;
+  });
+}
+
+function playIndexedStage(entrants, pairings, stageName, aggregate, settings, teamMap) {
+  const matches = pairings.map(([left, right]) => [entrants[left], entrants[right]]);
+  return playStage(matches, stageName, aggregate, settings, teamMap);
+}
+
+function resolveEntrant(code, slotMap, thirdByGroup, assignments) {
+  if (code.startsWith("3:")) {
+    const matchId = code.slice(2);
+    return thirdByGroup[assignments[matchId]];
+  }
+  return slotMap[code];
+}
+
+function assignThirdSlots(qualifiedGroups) {
+  const qualified = new Set(qualifiedGroups);
+  const slots = Object.entries(THIRD_SLOTS)
+    .map(([id, candidates]) => ({
+      id,
+      candidates: candidates.filter((group) => qualified.has(group))
+    }))
+    .sort((a, b) => a.candidates.length - b.candidates.length || a.id.localeCompare(b.id));
+
+  const result = {};
+  const used = new Set();
+
+  function backtrack(index) {
+    if (index === slots.length) return true;
+    const slot = slots[index];
+    const candidates = sortCopy(slot.candidates, (a, b) => {
+      const scarcityA = scarcityScore(a, slots, used);
+      const scarcityB = scarcityScore(b, slots, used);
+      return scarcityA - scarcityB || qualifiedGroups.indexOf(a) - qualifiedGroups.indexOf(b);
+    });
+    for (const group of candidates) {
+      if (used.has(group)) continue;
+      result[slot.id] = group;
+      used.add(group);
+      if (backtrack(index + 1)) return true;
+      used.delete(group);
+      delete result[slot.id];
+    }
+    return false;
+  }
+
+  if (!backtrack(0)) {
+    Object.keys(THIRD_SLOTS).forEach((slotId) => {
+      const fallback = THIRD_SLOTS[slotId].find((group) => qualified.has(group) && !used.has(group));
+      if (fallback) {
+        result[slotId] = fallback;
+        used.add(fallback);
+      }
+    });
+  }
+
+  return result;
+}
+
+function scarcityScore(group, slots, used) {
+  if (used.has(group)) return Number.POSITIVE_INFINITY;
+  return slots.reduce((count, slot) => count + (slot.candidates.includes(group) ? 1 : 0), 0);
+}
+
+function playKnockout(a, b, settings) {
+  const match = playMatch(a, b, settings, true);
+  return match.winner;
+}
+
+function playMatch(a, b, settings, needsWinner) {
+  const ratingA = effectiveRating(a, settings);
+  const ratingB = effectiveRating(b, settings);
+  const diff = ratingA - ratingB;
+  const ratio = Math.exp(diff / (620 * settings.upsetFactor));
+  const lambdaA = clamp(settings.baseGoals * Math.sqrt(ratio), 0.15, 4.8);
+  const lambdaB = clamp(settings.baseGoals / Math.sqrt(ratio), 0.15, 4.8);
+  const goalsA = poisson(lambdaA);
+  const goalsB = poisson(lambdaB);
+
+  let winner = null;
+  if (needsWinner) {
+    if (goalsA > goalsB) winner = a;
+    else if (goalsB > goalsA) winner = b;
+    else {
+      const shootoutChance = 1 / (1 + Math.pow(10, -(ratingA - ratingB) / 850));
+      winner = Math.random() < shootoutChance ? a : b;
+    }
+  }
+
+  return { goalsA, goalsB, winner };
+}
+
+function effectiveRating(team, settings) {
+  return team.rating + (team.host ? settings.hostBoost : 0);
+}
+
+function poisson(lambda) {
+  const limit = Math.exp(-lambda);
+  let product = 1;
+  let k = 0;
+  do {
+    k += 1;
+    product *= Math.random();
+  } while (product > limit);
+  return k - 1;
+}
+
+function renderEmptyResults() {
+  els.leaderCards.innerHTML = "";
+  ["冠军", "决赛", "四强", "黑马"].forEach((label) => {
+    const card = document.createElement("article");
+    card.className = "leader-card";
+    card.innerHTML = `<small>${label}</small><strong>等待模拟</strong><div class="metric">--</div>`;
+    els.leaderCards.appendChild(card);
+  });
+  els.probabilityBody.innerHTML = `<tr><td class="empty-state" colspan="10">模拟完成后显示概率</td></tr>`;
+  renderGroups();
+}
+
+function renderResults() {
+  if (!results) {
+    renderEmptyResults();
+    return;
+  }
+  renderLeaderCards();
+  renderProbabilityTable();
+  renderGroups();
+}
+
+function getRows() {
+  if (!results) return [];
+  const total = results.total;
+  return Object.values(results.rows).map((row) => {
+    const calculated = { ...row };
+    STAGES.forEach((stage) => {
+      calculated[stage] = row[stage] / total;
+    });
+    calculated.avgPoints = row.avgPoints / total;
+    calculated.avgGroupPosition = row.groupPositionSum / total;
+    return calculated;
+  });
+}
+
+function renderLeaderCards() {
+  const rows = getRows();
+  const champion = sortCopy(rows, (a, b) => b.champion - a.champion)[0];
+  const finalist = sortCopy(rows, (a, b) => b.final - a.final)[0];
+  const semi = sortCopy(rows, (a, b) => b.sf - a.sf)[0];
+  const longshot = sortCopy(
+    rows.filter((row) => row.team.rating < 1750),
+    (a, b) => b.qf - a.qf
+  )[0];
+  const cards = [
+    ["最大冠军热门", champion, "champion"],
+    ["最稳决赛候选", finalist, "final"],
+    ["四强概率最高", semi, "sf"],
+    ["低强度黑马", longshot, "qf"]
+  ];
+  els.leaderCards.innerHTML = cards
+    .map(([label, row, key]) => {
+      if (!row) return "";
+      return `
+        <article class="leader-card">
+          <small>${label}</small>
+          <strong>${row.team.zh}</strong>
+          <div class="metric">${formatPct(row[key])}</div>
+          <span>${row.team.en} · ${row.team.group} 组</span>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderProbabilityTable() {
+  const sortKey = els.sortSelect.value;
+  const rows = sortCopy(getRows(), (a, b) => b[sortKey] - a[sortKey] || b.team.rating - a.team.rating);
+  els.probabilityBody.innerHTML = rows
+    .map((row) => {
+      return `
+        <tr>
+          <td>${teamCell(row.team)}</td>
+          <td>${row.team.group}</td>
+          <td>${row.team.rating}</td>
+          <td>${barCell(row.groupWinner)}</td>
+          <td>${barCell(row.r32)}</td>
+          <td>${barCell(row.r16)}</td>
+          <td>${barCell(row.qf)}</td>
+          <td>${barCell(row.sf)}</td>
+          <td>${barCell(row.final)}</td>
+          <td>${barCell(row.champion)}</td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function renderGroups() {
+  const rows = getRows();
+  const byTeam = new Map(rows.map((row) => [row.team.id, row]));
+  els.groupGrid.innerHTML = GROUPS.map((group) => {
+    const teams = state.teams
+      .filter((team) => team.group === group)
+      .map((team) => byTeam.get(team.id) || { team, groupWinner: 0, r32: 0, avgGroupPosition: 0 })
+      .sort((a, b) => (a.avgGroupPosition || 99) - (b.avgGroupPosition || 99) || b.team.rating - a.team.rating);
+    return `
+      <article class="group-card">
+        <h2><span>${group} 组</span><small>${teams.map((row) => row.team.zh).join(" · ")}</small></h2>
+        <ol>
+          ${teams
+            .map(
+              (row) => `
+                <li class="group-row">
+                  <strong>${row.team.zh}</strong>
+                  <span>第一 ${formatPct(row.groupWinner)}</span>
+                  <span>晋级 ${formatPct(row.r32)}</span>
+                </li>
+              `
+            )
+            .join("")}
+        </ol>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderTeamsEditor() {
+  const query = (els.teamSearch?.value || "").trim().toLowerCase();
+  const teams = state.teams
+    .filter((team) => {
+      if (!query) return true;
+      return (
+        team.zh.toLowerCase().includes(query) ||
+        team.en.toLowerCase().includes(query) ||
+        team.group.toLowerCase() === query
+      );
+    })
+    .sort((a, b) => a.group.localeCompare(b.group) || a.slot - b.slot);
+
+  els.teamEditorBody.innerHTML = teams
+    .map(
+      (team) => `
+        <tr>
+          <td>${teamCell(team)}</td>
+          <td>${team.en}</td>
+          <td>${team.group}</td>
+          <td>${team.slot}</td>
+          <td>
+            <input class="team-rating-input" type="number" min="1200" max="2200" step="5" value="${team.rating}" data-team="${team.id}" aria-label="${team.zh} 强度分" />
+          </td>
+          <td>${team.host ? `<span class="host-pill">东道主</span>` : ""}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  els.teamEditorBody.querySelectorAll(".team-rating-input").forEach((input) => {
+    input.addEventListener("change", () => {
+      const team = state.teams.find((item) => item.id === input.dataset.team);
+      team.rating = clamp(Math.round(numberFromInput(input, team.rating)), 1200, 2200);
+      input.value = team.rating;
+      saveState();
+      renderResults();
+    });
+  });
+}
+
+function renderStaticBracket() {
+  els.bracketList.innerHTML = ROUND32.map((match) => {
+    return `<div class="bracket-item">${match.id}: ${formatEntrant(match.a)} vs ${formatEntrant(match.b)}</div>`;
+  }).join("");
+}
+
+function teamCell(team) {
+  return `
+    <div class="team-cell">
+      <span class="badge">${team.group}${team.slot}</span>
+      <span class="team-name">
+        <strong>${team.zh}</strong>
+        <span>${team.en}</span>
+      </span>
+    </div>
+  `;
+}
+
+function barCell(value) {
+  const pct = clamp(value * 100, 0, 100);
+  return `
+    <div class="bar-cell">
+      <div class="bar-track">
+        <div class="bar-fill" style="width: ${pct}%"></div>
+        <span class="bar-label">${formatPct(value)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function formatEntrant(code) {
+  if (code.startsWith("3:")) {
+    const id = code.slice(2);
+    return `最佳第三名 ${THIRD_SLOTS[id].join("/")}`;
+  }
+  const place = code[0] === "1" ? "第 1" : "第 2";
+  return `${code[1]} 组${place}`;
+}
+
+function formatPct(value) {
+  if (!Number.isFinite(value)) return "--";
+  if (value > 0 && value < 0.001) return "<0.1%";
+  return `${(value * 100).toFixed(value < 0.1 ? 1 : 0)}%`;
+}
+
+function formatInt(value) {
+  return new Intl.NumberFormat("zh-CN").format(value);
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function sortCopy(array, compare) {
+  return [...array].sort(compare);
+}
+
+function exportCsv() {
+  if (!results) return;
+  const headers = ["team_zh", "team_en", "group", "rating", "group_winner", "round32", "round16", "quarterfinal", "semifinal", "final", "champion"];
+  const rows = getRows()
+    .sort((a, b) => b.champion - a.champion)
+    .map((row) =>
+      [
+        row.team.zh,
+        row.team.en,
+        row.team.group,
+        row.team.rating,
+        row.groupWinner,
+        row.r32,
+        row.r16,
+        row.qf,
+        row.sf,
+        row.final,
+        row.champion
+      ].join(",")
+    );
+  downloadFile(`wc2026-probabilities-${Date.now()}.csv`, [headers.join(","), ...rows].join("\n"), "text/csv;charset=utf-8");
+}
+
+function exportConfig() {
+  downloadFile(
+    `wc2026-config-${Date.now()}.json`,
+    JSON.stringify({ teams: state.teams, settings: state.settings }, null, 2),
+    "application/json;charset=utf-8"
+  );
+}
+
+function importConfig(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const imported = JSON.parse(reader.result);
+      if (!Array.isArray(imported.teams)) throw new Error("配置里缺少 teams。");
+      state = {
+        teams: mergeTeams(imported.teams),
+        settings: { ...DEFAULT_SETTINGS, ...imported.settings }
+      };
+      saveState();
+      hydrateControls();
+      renderTeamsEditor();
+      runSimulation();
+    } catch (error) {
+      alert(`导入失败：${error.message}`);
+    } finally {
+      event.target.value = "";
+    }
+  };
+  reader.readAsText(file, "utf-8");
+}
+
+function resetAll() {
+  state = {
+    teams: cloneDefaultTeams(),
+    settings: { ...DEFAULT_SETTINGS }
+  };
+  saveState();
+  hydrateControls();
+  renderTeamsEditor();
+  runSimulation();
+}
+
+function downloadFile(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+    </script>
+  </body>
+</html>
